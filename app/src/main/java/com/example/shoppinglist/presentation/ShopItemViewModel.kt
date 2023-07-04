@@ -24,7 +24,7 @@ class ShopItemViewModel : ViewModel() {
 
     private val _errorInputCount = MutableLiveData<Boolean>()
     val errorInputCount: LiveData<Boolean>
-        get() = _errorInputName
+        get() = _errorInputCount
 
     private val _shopItem = MutableLiveData<ShopItem>()
     val shopItem: LiveData<ShopItem>
@@ -42,8 +42,10 @@ class ShopItemViewModel : ViewModel() {
     fun addShopItem(inputName: String?, inputCount: String?) {
         val name = parseName(inputName)
         val count = parseCount(inputCount)
-        if (validateInput(name, count)) {
-            addShopItemUseCase.addShopItem(ShopItem(name, count, true))
+        val fieldsValid = validateInput(name, count)
+        if (fieldsValid) {
+            val shopItem = ShopItem(name, count, true)
+            addShopItemUseCase.addShopItem(shopItem)
             finishWork()
         }
     }
@@ -51,9 +53,10 @@ class ShopItemViewModel : ViewModel() {
     fun editShopItem(inputName: String?, inputCount: String?) {
         val name = parseName(inputName)
         val count = parseCount(inputCount)
-        if (validateInput(name, count)) {
+        val fieldsValid = validateInput(name, count)
+        if (fieldsValid) {
             _shopItem.value?.let {
-                val item = it.copy(name=name, count=count)
+                val item = it.copy(name = name, count = count)
                 editShopItemUseCase.editShopItem(item)
                 finishWork()
             }
@@ -85,11 +88,11 @@ class ShopItemViewModel : ViewModel() {
         return result
     }
 
-    private fun resetErrorInputName() {
+    fun resetErrorInputName() {
         _errorInputName.value = false
     }
 
-    private fun resetErrorInputCount() {
+    fun resetErrorInputCount() {
         _errorInputCount.value = false
     }
 
